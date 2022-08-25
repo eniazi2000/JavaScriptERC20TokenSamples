@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-3.6.0.min.js"></script>
+    <script src="./web3.js"></script>
+    <script src="./main.js"></script>
+</head>
+<body>
+    <table id="tokensList" style="width:100%;">
+        <thead>
+            <tr>
+                <th style="width:25% ;">name</th>
+                <th style="width:25% ;">symbol</th>
+                <th style="width:25% ;">contract</th>
+                <th style="width:25% ;">decimal</th>
+            </tr>
+        </thead>
+        <tbody>
+                
+        </tbody>
+
+    </table>
+
+
+    <div>
+        <input type="text" id="contractAddressTxt"/>
+        <button onclick="getContractInfo()" >add</button>
+    </div>
+    <div>
+        <h2>Account</h2>
+        <span id="pkAddress"></span>
+        <button onclick="createAccount()">Generate Wallet</button>
+    </div>
+</body>
+</html>
