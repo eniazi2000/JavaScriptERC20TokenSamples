@@ -59,12 +59,24 @@ var account;
         $(sendBtn).text("Send Token");
 
         $(sendBtn).click(function(e){
+          
+          
+          
+          var dec =parseInt($(this).closest("tr").find("td")[3].innerHTML);
+          var conAdd =$(this).closest("tr").find("td")[2].innerHTML;
           var count;
-          var contract = new web3.eth.Contract(abi, "0xfc51fDB66c20797285E12BBD3db5bC2A3FbC0874", {from: account.address})
+          var contract = new web3.eth.Contract(abi, conAdd, {from: account.address});
           web3.eth.getTransactionCount(account.address).then(function(v){console.log(v); count = v})  
-          var amount = 12;// /(web3.utils.toBN(10).pow(web3.utils.toBN(2)));
-          var rawTransaction = {"from":account.address, "gasPrice":Web3.utils.toHex(2 * 1e9),"gasLimit":Web3.utils.toHex(210000),"to":"0xfc51fDB66c20797285E12BBD3db5bC2A3FbC0874","value":"0x0","data":contract.methods.transfer("0xdE53dD7CbAD7127Fe60E5fC4148824CD1163f3E9", amount).encodeABI(),"nonce":web3.utils.toHex(count)} 
-//          var rawTransaction = {  "from": account.address ,  "to": "0xdE53dD7CbAD7127Fe60E5fC4148824CD1163f3E9",  "value": web3.utils.toHex(web3.utils.toWei("0.001", "ether")),  "gas": 200000,  "chainId": 80001};
+          var amount =parseFloat($(sendTxt).val()) * (web3.utils.toBN(10).pow(web3.utils.toBN(dec)));// /(web3.utils.toBN(10).pow(web3.utils.toBN(2)));
+          var rawTransaction = {"from":account.address, "gasPrice":Web3.utils.toHex(2 * 1e9),"gasLimit":Web3.utils.toHex(210000),"to":conAdd,"value":"0x0","data":contract.methods.transfer("0xdE53dD7CbAD7127Fe60E5fC4148824CD1163f3E9", amount).encodeABI(),"nonce":web3.utils.toHex(count)} 
+
+
+
+
+          //var rawTransaction = {  "from": account.address ,  "to": "0xdE53dD7CbAD7127Fe60E5fC4148824CD1163f3E9",  "value": web3.utils.toHex(web3.utils.toWei("0.001", "ether")),  "gas": 200000,  "chainId": 80001};
+ 
+ 
+ 
           account.signTransaction(rawTransaction)  
           .then(signedTx => web3.eth.sendSignedTransaction(signedTx.rawTransaction))  
           .then(receipt => console.log("Transaction receipt: ", receipt))  

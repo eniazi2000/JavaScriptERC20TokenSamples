@@ -15,7 +15,8 @@
     <div class="container" style="margin-top: 20px;">
         <div class="row">
         <div class="col-md-6 col-lg-6">
-            <div >
+            <div class="jumbotron" >
+                <h2>Add token to List by contract</h2>
                 <input class="input-lg" type="text" id="contractAddressTxt"/>
                 <button class="btn btn-primary btn-lg" onclick="getContractInfo()" >add</button>
             </div>
@@ -26,8 +27,11 @@
                 <h4 id="pkAddress"></h4>
                 <h2 id="pkBalance"></h2>
                 <br/>
-                <button onclick="createAccount()">Generate Wallet</button>
-                <button onclick="getBalanceEth()">Ether Banance</button>
+                <button class="btn btn-default btn-lg" onclick="createAccount()">Generate Wallet</button>
+                <button class="btn btn-default btn-lg" onclick="getBalanceEth()">Ether Balance</button>
+                <hr/>
+                <input class="input-lg" type="text"/>
+                <button class="btn btn-primary btn-lg" onclick="">Send</button>
             </div>
         </div>
         </div>
@@ -39,11 +43,11 @@
         <thead>
             <tr>
                 <th style="width:20% ;">name</th>
-                <th style="width:20% ;">symbol</th>
+                <th style="width:5% ;">symbol</th>
                 <th style="width:20% ;">contract</th>
                 <th style="width:5% ;">decimal</th>
                 <th style="width:20% ;">balance</th>
-                <th style="width:15% ;">tools</th>
+                <th style="width:30% ;">tools</th>
             </tr>
         </thead>
         <tbody>
