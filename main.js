@@ -2,7 +2,43 @@ var abi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","typ
 //var web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io/v3/b2c7aaa8e1b346288c6b4cce36e39f3d'));
 var web3 = new Web3(new Web3.providers.HttpProvider('https://rpc.ankr.com/polygon_mumbai'));
 var account;
- function getContractInfo()
+ 
+class TransactionChecker {
+  web3;
+  account;
+
+  constructor(account) {
+      this.web3 = new Web3(new Web3.providers.HttpProvider('https://rpc.ankr.com/polygon_mumbai'));
+      this.account = account.toLowerCase();
+  }
+
+  async checkBlock() {
+      let block = await this.web3.eth.getBlock('latest');
+      let number = block.number;
+      console.log('Searching block ' + number);
+
+      if (block != null && block.transactions != null) {
+          for (let txHash of block.transactions) {
+              let tx = await this.web3.eth.getTransaction(txHash);
+              if (this.account == tx.to.toLowerCase()) {
+                  console.log('Transaction found on block: ' + number);
+                  console.log({address: tx.from, value: this.web3.utils.fromWei(tx.value, 'ether'), timestamp: new Date()});
+              }
+          }
+      }
+  }
+}
+createAccount();
+let txChecker = new TransactionChecker(account.address);
+setInterval(() => {
+  txChecker.checkBlock();
+},  1000);
+
+
+
+
+
+function getContractInfo()
   {
     if(account!=null)
     {
@@ -37,6 +73,9 @@ var account;
         var td4 = document.createElement("td");
         var td5 = document.createElement("td");
         var td6 = document.createElement("td");
+        var inputGroup = document.createElement("div");
+        var inputGroupSpan = document.createElement("span");
+        var hr = document.createElement("hr");
 
         $(td1).text(value.name);
         $(td2).text(value.symbol);
@@ -51,12 +90,17 @@ var account;
         var refreshBalanceBtn = document.createElement("button");
 
 
-        $(refreshBalanceBtn).addClass("btn btn-sm btn-info btn-block");
-        $(refreshBalanceBtn).text("Refresh Balance");
+        $(refreshBalanceBtn).addClass("btn btn-sm btn-info");
+        $(refreshBalanceBtn).attr("style","margin-left:5px;margin-right:5px;");
+        $(refreshBalanceBtn).text("Refresh");
 
-        $(sendTxt).addClass("input-sm btn-block");
-        $(sendBtn).addClass("btn btn-sm btn-primary btn-block");
-        $(sendBtn).text("Send Token");
+
+        $(inputGroup).addClass("input-group");
+        $(inputGroupSpan).addClass("input-group-btn");
+        $(sendTxt).addClass("form-control input-sm");
+        $(sendTxt).attr("placeholder","address to send tokn...");
+        $(sendBtn).addClass("btn btn-sm btn-primary");
+        $(sendBtn).text("Send");
 
         $(sendBtn).click(function(e){
           
@@ -86,10 +130,14 @@ var account;
       
         });
 
+        $(inputGroupSpan).append(sendBtn);
+        $(inputGroup).append(sendTxt);
+        $(inputGroup).append(inputGroupSpan);
 
-        $(td6).append(refreshBalanceBtn);
-        $(td6).append(sendTxt);
-        $(td6).append(sendBtn);
+
+        $(td5).append(refreshBalanceBtn);
+      //  $(td6).append(hr);
+        $(td6).append(inputGroup);
         /////////////////////////
 
         $(tr).append(td1);
@@ -113,6 +161,15 @@ var account;
     //account = web3.eth.accounts.create();
     account = web3.eth.accounts.privateKeyToAccount('0xc205105aaf0f5ebb0bbafb8cc21687133daa3266367e00c6144f7fe66104a38f');
     console.log(account);
+    var QR_CODE = new QRCode("qrcode", {
+      width: 78,
+      height: 78,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+
+    QR_CODE.makeCode(account.address);
     $("#pkAddress").text(account.address);
     getBalanceEth();
   }
