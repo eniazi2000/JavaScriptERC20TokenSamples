@@ -1,0 +1,100 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <script src="./bootstrap.min.js"></script>
+    <script src="./qrcode.min.js"></script>
+    <script src="./sha256.js"></script>
+    <script src="./web3.js"></script>
+
+</head>
+
+<body>
+    <br />
+    <div class="continer">
+        <div class="row">
+            <div class="col-md-offset-4 col-md-4" style="margin-bottom:10px;padding: 50px;">
+                <center>
+                    <h2>Easy Crypto Dot Net (ECDN) Wallet</h2>
+                    <div id="qrcode"></div>
+                    <h4 id="pkAddress"></h4>
+                    <h3>Balance:<strong id="balance"></strong><span id="pending"></span></h3>
+                </center>
+                <input class="input-lg btn-block" type="text" id="toTxt" />
+                <input class="input-lg btn-block" type="text" id="amountTxt" />
+
+                <button class="btn btn-lg btn-primary btn-block" id="sendBtn" onclick="sendMony()">Send</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+<script>
+    var web3 = new Web3();
+    var account;
+    function sendMony() {
+        var data = {
+            from: account.address,
+            to: $("#toTxt").val(),
+            amount: parseInt($("#amountTxt").val()),
+            fee: 256,
+            date: Date.now(),
+            signature: account.sign(sha256(account.address + $("#toTxt").val() + Date.now() + $("#amountTxt").val() + 256)).signature
+        };
+        console.log(data);
+        $.ajax({
+            type: "POST",
+            data: { "": JSON.stringify(data) },
+            url: 'http://127.0.0.1:3003/api/transaction/',
+        }).done(function (res) {
+            console.log(res);
+            $("body").find(".alert").remove();
+            $("body").append("<div class='alert alert-info'>" + res + "</div>");
+            getBalance();
+        }).fail(function (xhr, err) {
+            console.log(err);
+        });
+    }
+    function getBalance() {
+        $.ajax({
+            type: "GET",
+            url: 'http://127.0.0.1:3003/api/wallet/' + account.address,
+
+        }).done(function (res) {
+            $("#balance").text((res.balance * 0.00000001).toFixed(8));
+            if (res.pendingBalance != 0)
+                $("#pending").text(" - pending(" + (res.pendingBalance * 0.00000001).toFixed(8) + ")");
+        }).fail(function (xhr, err) {
+            console.log(err);
+        });
+    }
+    $("document").ready(function () {
+        createAccount();
+    });
+    function createAccount() {
+        //0xc205105aaf0f5ebb0bbafb8cc21687133daa3266367e00c6144f7fe66104a38f
+        //account = web3.eth.accounts.create();
+        account = web3.eth.accounts.privateKeyToAccount('0xc205105aaf0f5ebb0bbafb8cc21687133daa3266367e00c6144f7fe66104a38f');
+        const msg = 'hello world'
+        // const msgHash = web3.eth.accounts.hashMessage(msg)
+        const signature = account.sign(msg)
+        var QR_CODE = new QRCode("qrcode", {
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H,
+        });
+
+        QR_CODE.makeCode(account.address);
+        $("#pkAddress").text(account.address);
+        getBalance();
+    }
+</script>
